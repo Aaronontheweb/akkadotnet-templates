@@ -1,26 +1,37 @@
 {
   "$schema": "http://json.schemastore.org/template",
   "author": "Akka",
-  "classifications": ["Akka.NET", "Web API","Cloud", "Service", "Web"],
-  "name": "Akka.NET + ASP.NET Core HTTP API",
+  "classifications": ["Akka.NET", "Akka.Cluster", "Web API","Cloud", "Service", "Web"],
+  "name": "Akka.NET + Akka.Cluster + ASP.NET Core HTTP API",
   "description": "An out-of-the-box solution for creating an ASP.NET API integrated with Akka.NET.",
-  "groupIdentity": "Akka.WebApi",
-  "identity": "Akka.WebApi.CSharp",
-  "shortName": "akkawebapi",
+  "groupIdentity": "Akka.Cluster.WebApi",
+  "identity": "Akka.Cluster.WebApi.CSharp",
+  "shortName": "akka.cluster.webapi",
   "defaultName": "AkkaHttpApi1",
   "tags": {
     "language": "C#",
     "type": "solution"
   },
+  "symbols": {
+      "Framework": {
+      "type": "parameter",
+      "description": "The target framework for the project.",
+      "datatype": "choice",
+      "choices": [
+        {
+          "choice": "net8.0",
+          "description": "Target net8.0"
+        },
+        {
+          "choice": "net9.0",
+          "description": "Target net9.0"
+        }
+      ],
+      "replaces": "FrameworkParameter",
+      "defaultValue": "net9.0"
+    },
+  },
   "sourceName": "WebApiTemplate",
   "preferNameDirectory": true,
-  "primaryOutputs": [{ "path": "WebApiTemplate.sln" }],
-  "sources": [
-    {
-      
-    }
-  ],
-  "symbols": {
-
-   },
+  "primaryOutputs": [{ "path": "WebApiTemplate.sln" }]
 }

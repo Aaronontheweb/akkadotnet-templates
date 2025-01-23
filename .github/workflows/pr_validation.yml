@@ -12,30 +12,12 @@ on:
   merge_group:
 
 jobs:
-  build-templates:
-    name: BuildTemplate
-    runs-on: ubuntu-latest
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-          fetch-depth: 0
-      - name: "Install .NET SDK"
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            8.0.x
-          global-json-file: "./global.json"
-      - name: "dotnet pack"
-        run: dotnet pack -c Release
   test:
-    name: Test-${{matrix.template}}-${{matrix.os}}
+    name: Test-${{matrix.os}}
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        template: ["WebApiTemplate", "AkkaConsoleTemplate", "AkkaStreamsTemplate"]
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest,]
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
@@ -47,33 +29,25 @@ jobs:
         with:
           dotnet-version: |
             8.0.x
-          global-json-file: "./global.json"
-      - name: "dotnet build"
-        run: dotnet build -c Release
-        working-directory: src/${{matrix.template}}
-      - name: "dotnet test"
-        run: dotnet test -c Release
-        working-directory: src/${{matrix.template}}
+            9.0.x
+      - name: "Update release notes and version"
+        shell: pwsh
+        run: |
+          ./build.ps1
+      - name: "dotnet pack"
+        run: dotnet pack -c Release -o bin/nuget
 
-  docker:
-    name: Docker-${{matrix.template}}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        template: ["WebApiTemplate"]
-    steps:
-      - name: "Checkout"
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-          fetch-depth: 0
-      - name: "Install .NET SDK"
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: |
-            8.0.x
-          global-json-file: "./global.json"
-      - name: "dotnet docker"
-        run: dotnet publish --os linux --arch x64 -c Release -p:PublishProfile=DefaultContainer
-        working-directory: src/${{matrix.template}}
+      - name: "Install templates"
+        run: dotnet new install bin/nuget/*.nupkg
 
+      - name: "Test dev templates"
+        shell: pwsh
+        run: |
+          ./scripts/test-templates.ps1
+
+      - name: Archive production artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: package
+          path: |
+            bin/**/*.nupkg
